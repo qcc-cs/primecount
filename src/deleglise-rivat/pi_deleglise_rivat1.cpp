@@ -40,6 +40,7 @@ namespace {
 /// For each element that is unmarked the first time update
 /// the binary indexed tree data structure.
 ///
+//KWANG : standard seive function with prime.
 template <typename Sieve>
 void cross_off(int64_t prime,
                int64_t low,
@@ -65,6 +66,7 @@ void cross_off(int64_t prime,
 /// Calculate the contribution of the hard special leaves
 /// using a segmented sieve to reduce memory usage.
 ///
+/// KWANG: In Silva, it covers S1+S2_hard. In rivat, it is S3.
 int64_t S2_hard(int64_t x,
                 int64_t y,
                 int64_t z,
@@ -92,10 +94,12 @@ int64_t S2_hard(int64_t x,
     // current segment [low, high[
     int64_t high = min(low + segment_size, limit);
     int64_t b = c + 1;
-
+    //initialize sieve
     fill(sieve.begin(), sieve.end(), 1);
 
     // pre-sieve multiples of first c primes
+    //KWANG turn off products of firsr c primes
+    //KWANG basically cross-off but no binary_tree here.
     for (int64_t b = 1; b <= c; b++)
     {
       int64_t k = next[b];
@@ -106,8 +110,9 @@ int64_t S2_hard(int64_t x,
 
     // initialize binary indexed tree from sieve
     tree.init(sieve);
-
+    // KWNANG: it is S1 in silva's paper.
     // For c + 1 <= b <= pi_sqrty
+    // KWANG if alpha=1 , pi_sqrty=
     // Find all special leaves: n = primes[b] * m, with mu[m] != 0 and primes[b] < lpf[m]
     // which satisfy: low <= (x / n) < high
     for (; b <= pi_sqrty; b++)
@@ -122,7 +127,7 @@ int64_t S2_hard(int64_t x,
       for (int64_t m = max_m; m > min_m; m--)
       {
         if (mu[m] != 0 && prime < lpf[m])
-        {
+        { // KWANG By using binary tree instead of sieve, we can save a lot time to count 1's. (BT <-> Sieve)
           int64_t n = prime * m;
           int64_t count = tree.count(low, x / n);
           int64_t phi_xn = phi[b] + count;
@@ -133,7 +138,7 @@ int64_t S2_hard(int64_t x,
       phi[b] += tree.count(low, high - 1);
       cross_off(prime, low, high, next[b], sieve, tree);
     }
-
+    // KWANG: S2_hard in Silva's paper.
     // For pi_sqrty < b <= pi_sqrtz
     // Find all hard special leaves: n = primes[b] * primes[l]
     // which satisfy: low <= (x / n) < high
@@ -208,8 +213,8 @@ int64_t pi_deleglise_rivat1(int64_t x)
   auto lpf = generate_lpf(y);
 
   int64_t pi_y = pi_legendre(y);
-  int64_t s1 = S1(x, y, c, 1);
-  int64_t s2 = S2(x, y, z, c, lpf, mu);
+  int64_t s1 = S1(x, y, c, 1); // KWANG : ordinary leaves
+  int64_t s2 = S2(x, y, z, c, lpf, mu); //KWANG : special leaves
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 

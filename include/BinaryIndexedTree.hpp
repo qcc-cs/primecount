@@ -73,7 +73,7 @@ public:
   ///
   int64_t count(int64_t low, int64_t high)
   {
-    int64_t pos = (high - low) >> 1;
+    int64_t pos = (high - low) >> 1; // KWANG integer division by 2
     int64_t sum = tree_[pos++];
     for (; pos &= pos - 1; sum += tree_[pos - 1]);
     return sum;
