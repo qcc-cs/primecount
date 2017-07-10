@@ -68,7 +68,7 @@ public:
     assert(number > 0);
     uint64_t q = number / 210;
     uint64_t r = number % 210;
-    return 48 * q + indexes_[r];
+    return 48 * q + indexes_[r];// Euler Toient(210)=48
   }
 
   static int64_t get_number(uint64_t index)
@@ -93,7 +93,7 @@ public:
     if (y > max())
       throw primecount_error("y must be <= FactorTable::max()");
 
-    y = std::max<int64_t>(8, y);
+    y = std::max<int64_t>(8, y);//Kwang: exclude multiple of 2,3,5,7
     T T_MAX = std::numeric_limits<T>::max();
     factor_.resize(get_index(y) + 1, T_MAX);
 
@@ -169,7 +169,7 @@ public:
   int64_t mu(int64_t index) const
   {
     assert(factor_[index] != 0);
-    return (factor_[index] & 1) ? -1 : 1;
+    return (factor_[index] & 1) ? -1 : 1;//kwang even odd check.
   }
 
   static maxint_t max()
